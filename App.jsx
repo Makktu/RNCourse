@@ -1,45 +1,57 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import Button from './src/components/Button';
 
+let initialState = {
+  count: 0,
+  message: 'Click + or - to change the count',
+};
+
+const reducer = (state, action) => {
+  switch (action) {
+    case 'increment':
+      if (state + 1 <= 10) {
+        return { ...state, count: count + 1 };
+      } else return 10;
+    case 'decrement':
+      if (state - 1 >= 0) {
+        return { ...state, count: count - 1 };
+      } else return 0;
+    case 'reset':
+      return initialState;
+    default:
+      return state;
+  }
+};
+
 export default function App() {
-  const [count, setCount] = useState(0);
-  const [message, setMessage] = useState('');
-  const incrementCount = () => {
-    if (count + 1 <= 10) {
-      setCount(count + 1);
-      setMessage('');
-    } else {
-      setMessage("Can't go above 10");
-    }
-  };
-  const decrementCount = () => {
-    if (count - 1 >= 0) {
-      setCount(count - 1);
-      setMessage('');
-    } else {
-      setMessage("Can't go below 0");
-    }
-  };
-  const resetCount = () => {
-    setCount(0);
-  };
+  const [state, dispatch] = useReducer(reducer, initialState);
+  console.log(state);
+
   return (
     <View style={styles.container}>
       <Text style={styles.headerStyle}>Hello Counter</Text>
-      <Text style={styles.textStyle}>{count}</Text>
-      {message ? (
-        <Text style={{ color: 'dodgerblue', fontSize: 14 }}>{message}</Text>
-      ) : (
-        <Text style={{ color: 'dodgerblue', fontSize: 14 }}>
-          Click + or - to change the Count
-        </Text>
-      )}
-      <Button textContent='+' action={incrementCount} />
-      <Button textContent='-' action={decrementCount} btnColor='red' />
-      <Button textContent='Reset' action={resetCount} btnColor='black' />
+      <Text style={styles.textStyle}>{state.count}</Text>
+      <Text style={{ color: 'dodgerblue', fontSize: 22 }}>{state.message}</Text>
 
+      <Button
+        textContent='+'
+        action={() => {
+          dispatch('increment');
+          // console.log(state.count);
+        }}
+      />
+      <Button
+        textContent='-'
+        action={() => dispatch('decrement')}
+        btnColor='red'
+      />
+      <Button
+        textContent='RESET'
+        action={() => dispatch('reset')}
+        btnColor='black'
+      />
       <StatusBar style='light' />
     </View>
   );
